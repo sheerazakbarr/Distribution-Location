@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🛒 Store Location Submission</title>
+    <title>Distribution Coordinates Submission</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Basic Styling (Same as before for good looks) */
+        /* General Styling */
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
@@ -15,7 +16,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #71b7e6, #9b59b6); 
+            background: linear-gradient(135deg, #71b7e6, #9b59b6);
             color: #333;
             overflow-x: hidden;
         }
@@ -26,7 +27,7 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             width: 100%;
-            max-width: 500px;
+            max-width: 450px;
             text-align: center;
             box-sizing: border-box;
         }
@@ -34,7 +35,7 @@
         h1 {
             color: #34495e;
             margin-bottom: 25px;
-            font-size: 2.2em;
+            font-size: 2.1em;
             font-weight: 700;
         }
 
@@ -52,35 +53,40 @@
             text-align: left;
         }
 
-        input[type="text"],
-        input[type="file"] {
+        input[type="text"] {
             width: 100%;
             padding: 12px 15px;
             border: 1px solid #ccc;
             border-radius: 8px;
             font-size: 1em;
-            color: #333;
-            background-color: #f8f8f8;
-            transition: all 0.3s ease;
             box-sizing: border-box;
         }
-        
-        /* File Input Styling for Camera Access */
+
+        /* Camera Input Style */
         #pictureInput {
-            border: 2px dashed #007bff; /* Highlight for photo input */
+            border: 2px dashed #007bff;
             background-color: #e6f7ff;
             padding: 15px;
             cursor: pointer;
+            text-align: center;
+        }
+        
+        /* Hide default file button text */
+        #pictureInput::file-selector-button {
+            display: none;
         }
 
-        #pictureInput::file-selector-button {
-            padding: 8px 15px;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-            margin-right: 15px;
+        .camera-icon-label {
+            display: block;
+            font-size: 1.1em;
+            color: #007bff;
+            font-weight: 700;
+        }
+        
+        .camera-icon-label i {
+            font-size: 2em;
+            margin-bottom: 5px;
+            color: #555;
         }
 
         button {
@@ -92,7 +98,6 @@
             cursor: pointer;
             font-size: 1.1em;
             font-weight: 700;
-            transition: background-color 0.3s ease;
             margin-top: 20px;
         }
 
@@ -110,7 +115,7 @@
             color: #00796b;
             text-align: center;
         }
-
+        
         #status.error {
             background-color: #ffebee;
             color: #c62828;
@@ -127,19 +132,22 @@
 <body>
 
     <div class="container">
-        <h1>🛒 Store Location Submission</h1>
+        <h1>Distribution Coordinates</h1>
         
         <form id="locationForm">
             
             <label for="distributionCode">Distribution Code:</label>
             <input type="text" id="distributionCode" placeholder="Enter Distribution Code" required>
             
-            <label for="pictureInput">Take/Upload Store Picture:</label>
+            <label for="distributionName">Distribution Name:</label>
+            <input type="text" id="distributionName" placeholder="Enter Distribution Name" required>
+
+            <label for="pictureInput" class="camera-icon-label">
+                <i class="fas fa-camera"></i>
+                Take/Upload Picture (Required)
+            </label>
             <input type="file" id="pictureInput" accept="image/*" capture="environment" required>
             
-            <label for="storeName">Enter Store Name:</label>
-            <input type="text" id="storeName" placeholder="Type Store Name Here" required>
-
             <div id="status">Click 'Submit' to get location...</div>
 
             <button type="submit" id="submitBtn">Get Location & Submit Data</button>
@@ -147,39 +155,4 @@
             <div class="coords-display">
                 <p>Latitude: <span id="displayLat">...</span></p>
                 <p>Longitude: <span id="displayLon">...</span></p>
-            </div>
-
-        </form>
-    </div>
-
-    <script>
-        // *************************************************************************
-        // ⚠️ CRITICAL: Paste your Google Apps Script Web App URL here
-        // *************************************************************************
-        const WEB_APP_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE'; 
-        // *************************************************************************
-
-        const locationForm = document.getElementById('locationForm');
-        const statusText = document.getElementById('status');
-        const submitBtn = document.getElementById('submitBtn');
-        const pictureInput = document.getElementById('pictureInput');
-        const displayLat = document.getElementById('displayLat');
-        const displayLon = document.getElementById('displayLon');
-
-        // Note on Picture: We cannot send the image file directly via a simple
-        // fetch request to Apps Script. A direct file upload requires either:
-        // 1. Uploading to Google Drive via the Drive API (more complex).
-        // 2. Uploading to a server (like your own PHP/Node backend).
-        //
-        // FOR SIMPLICITY WITH GOOGLE SHEETS: We will only send the text data
-        // (Code, Name, Coordinates). The image input is included to prompt the 
-        // user to take a picture, making it a required step.
-
-        locationForm.addEventListener('submit', function(e) {
-            e.preventDefault(); 
-            
-            // 1. Basic Validation
-            if (!document.getElementById('distributionCode').value || !document.getElementById('storeName').value || pictureInput.files.length === 0) {
-                statusText.textContent = '❌ Please fill Distribution Code, Store Name, and take a Picture.';
-                statusText.classList.add('error');
-                return;
+                <p>Timestamp: <span id="
