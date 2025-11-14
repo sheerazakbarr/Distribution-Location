@@ -6,7 +6,7 @@
     <title>🛒 Store Location Submission</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Basic Reset & Body Styling */
+        /* Basic Styling (Same as before for good looks) */
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
@@ -15,12 +15,11 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #71b7e6, #9b59b6); /* Gradient Background */
+            background: linear-gradient(135deg, #71b7e6, #9b59b6); 
             color: #333;
             overflow-x: hidden;
         }
 
-        /* Container for the form */
         .container {
             background-color: #ffffff;
             padding: 30px 40px;
@@ -39,7 +38,6 @@
             font-weight: 700;
         }
 
-        /* Form Elements */
         form {
             display: flex;
             flex-direction: column;
@@ -55,7 +53,7 @@
         }
 
         input[type="text"],
-        select {
+        input[type="file"] {
             width: 100%;
             padding: 12px 15px;
             border: 1px solid #ccc;
@@ -66,16 +64,27 @@
             transition: all 0.3s ease;
             box-sizing: border-box;
         }
+        
+        /* File Input Styling for Camera Access */
+        #pictureInput {
+            border: 2px dashed #007bff; /* Highlight for photo input */
+            background-color: #e6f7ff;
+            padding: 15px;
+            cursor: pointer;
+        }
 
-        input[type="text"]:focus,
-        select:focus {
-            border-color: #71b7e6;
-            box-shadow: 0 0 8px rgba(113, 183, 230, 0.3);
-            outline: none;
+        #pictureInput::file-selector-button {
+            padding: 8px 15px;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 15px;
         }
 
         button {
-            background-color: #28a745; /* Green submit button */
+            background-color: #28a745;
             color: white;
             padding: 14px 20px;
             border: none;
@@ -83,22 +92,15 @@
             cursor: pointer;
             font-size: 1.1em;
             font-weight: 700;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            transition: background-color 0.3s ease;
             margin-top: 20px;
-        }
-
-        button:hover {
-            background-color: #218838;
-            transform: translateY(-2px);
         }
 
         button:disabled {
             background-color: #cccccc;
             cursor: not-allowed;
-            transform: translateY(0);
         }
 
-        /* Status & Info Display */
         #status {
             margin-top: 20px;
             padding: 12px;
@@ -120,26 +122,6 @@
             font-size: 0.95em;
             color: #666;
         }
-
-        .coords-display span {
-            font-weight: 600;
-            color: #444;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 600px) {
-            .container {
-                margin: 20px;
-                padding: 25px 30px;
-            }
-            h1 {
-                font-size: 1.8em;
-            }
-            button {
-                font-size: 1em;
-                padding: 12px 15px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -149,27 +131,18 @@
         
         <form id="locationForm">
             
-            <label for="division">Select Division:</label>
-            <select id="division" required>
-                <option value="">-- Select Division --</option>
-            </select>
-
-            <label for="asm">Select ASM:</label>
-            <select id="asm" required>
-                <option value="">-- Select ASM --</option>
-            </select>
-
-            <label for="area">Select Area:</label>
-            <select id="area" required>
-                <option value="">-- Select Area --</option>
-            </select>
+            <label for="distributionCode">Distribution Code:</label>
+            <input type="text" id="distributionCode" placeholder="Enter Distribution Code" required>
+            
+            <label for="pictureInput">Take/Upload Store Picture:</label>
+            <input type="file" id="pictureInput" accept="image/*" capture="environment" required>
             
             <label for="storeName">Enter Store Name:</label>
             <input type="text" id="storeName" placeholder="Type Store Name Here" required>
-            
+
             <div id="status">Click 'Submit' to get location...</div>
 
-            <button type="submit" id="submitBtn">Get Location & Submit to Google Sheet</button>
+            <button type="submit" id="submitBtn">Get Location & Submit Data</button>
 
             <div class="coords-display">
                 <p>Latitude: <span id="displayLat">...</span></p>
@@ -186,246 +159,27 @@
         const WEB_APP_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE'; 
         // *************************************************************************
 
-        // Hierarchy Data (Populated from your shared image)
-        const hierarchyData = {
-            "FBRM CENTRAL": {
-                "ASM GUJRANWALA": ["GUJRANWALA A", "GUJRANWALA B", "GUJRANWALA C"],
-                "ASM LAHORE D": ["LAHORE D/F", "LAHORE D/C", "LAHORE CANTT"],
-                "ASM MULTAN": ["MULTAN A", "MULTAN B", "MULTAN C", "MULTAN D"],
-                "ASM FAISALABAD": ["FSD A", "FSD B", "FSD C"],
-                "ASM SIALKOT": ["SIALKOT A", "SIALKOT B"],
-                "ASM SHEIKHUPURA": ["SHEIKHUPURA A", "SHEIKHUPURA B"],
-                "ASM SAHIWAL": ["SAHIWAL A", "SAHIWAL B"],
-                "ASM BAHAWALPUR": ["BWP A", "BWP B"],
-                "ASM RAHIM YAR KHAN": ["RYK A", "RYK B"],
-                "ASM ATTOCK": ["ATTOCK A"],
-                "ASM DG KHAN": ["DG KHAN A"],
-                "ASM JHELUM": ["JHELUM A"],
-                "ASM JHANG": ["JHANG A"],
-                "ASM KASUR": ["KASUR A"],
-                "ASM KHANEWAL": ["KHANEWAL A"],
-                "ASM MIANWALI": ["MIANWALI A"],
-                "ASM MUZAFFARGARH": ["MUZAFFARGARH A"],
-                "ASM OKARA": ["OKARA A"],
-                "ASM SAIDPUR": ["SAIDPUR A"],
-                "ASM SARGODHA": ["SARGODHA A", "SARGODHA B"],
-                "ASM TAXILA": ["TAXILA A"],
-                "ASM TOBA TEK SINGH": ["TTS A"],
-                "ASM VEHARI": ["VEHARI A"]
-            },
-            "FBRM NORTH": {
-                "ASM RAWALPINDI": ["RWP A", "RWP B", "RWP C", "RWP D"],
-                "ASM PESHAWAR": ["PESHAWAR A", "PESHAWAR B", "PESHAWAR C"],
-                "ASM ISLAMABAD": ["ISLAMABAD A", "ISLAMABAD B"],
-                "ASM ABBOTTABAD": ["ABBOTTABAD A"],
-                "ASM BUNER": ["BUNER A"],
-                "ASM CHAKWAL": ["CHAKWAL A"],
-                "ASM DIR LOWER": ["DIR L A"],
-                "ASM SWAT": ["SWAT A"],
-                "ASM KOHAT": ["KOHAT A"],
-                "ASM MARDAN": ["MARDAN A"],
-                "ASM NOWSHERA": ["NOWSHERA A"],
-                "ASM SAWABI": ["SWABI A"],
-                "ASM WAHP CANTT": ["WAHC A"],
-                "ASM BANNU": ["BANNU A"],
-                "ASM DERA ISMAIL KHAN": ["DIK A"],
-                "ASM HARIPUR": ["HARIPUR A"],
-                "ASM KHARIAN": ["KHARIAN A"],
-                "ASM MANSEHRA": ["MANSEHRA A"],
-                "ASM MINGORA": ["MINGORA A"],
-                "ASM PARACHINAR": ["PARACHINAR A"],
-                "ASM SAKKARDU": ["SKD A"],
-                "ASM GILGIT": ["GILGIT A"],
-                "ASM MUZZAFARABAD": ["MUZAF A"],
-                "ASM MIRPUR": ["MIRPUR A"],
-                "ASM BAGH": ["BAGH A"]
-            },
-            "FBRM SOUTH": {
-                "ASM KARACHI F": ["KHI F"],
-                "ASM KARACHI C": ["KHI C", "KHI C/B"],
-                "ASM HYDERABAD": ["HYD A", "HYD B"],
-                "ASM SUKKUR": ["SUKKUR A"],
-                "ASM QUETTA": ["QUETTA A"],
-                "ASM LARKANA": ["LARKANA A"],
-                "ASM NAWABSHAH": ["NWB A"],
-                "ASM CHAMAN": ["CHAMAN A"]
-            }
-            // Add your complete hierarchy data here
-        };
-
-        const divisionSelect = document.getElementById('division');
-        const asmSelect = document.getElementById('asm');
-        const areaSelect = document.getElementById('area');
         const locationForm = document.getElementById('locationForm');
         const statusText = document.getElementById('status');
         const submitBtn = document.getElementById('submitBtn');
+        const pictureInput = document.getElementById('pictureInput');
         const displayLat = document.getElementById('displayLat');
         const displayLon = document.getElementById('displayLon');
 
-
-        // ---------------------------------------------------
-        // I. Hierarchy Selectors Population Functions
-        // ---------------------------------------------------
-
-        function populateDivisions() {
-            // Populate Divisions
-            for (const division in hierarchyData) {
-                const option = document.createElement('option');
-                option.value = division;
-                option.textContent = division;
-                divisionSelect.appendChild(option);
-            }
-        }
-
-        function populateASMs() {
-            asmSelect.innerHTML = '<option value="">-- Select ASM --</option>'; 
-            areaSelect.innerHTML = '<option value="">-- Select Area --</option>'; 
-            
-            const selectedDivision = divisionSelect.value;
-            if (selectedDivision && hierarchyData[selectedDivision]) {
-                for (const asm in hierarchyData[selectedDivision]) {
-                    const option = document.createElement('option');
-                    option.value = asm;
-                    option.textContent = asm;
-                    asmSelect.appendChild(option);
-                }
-            }
-        }
-
-        function populateAreas() {
-            areaSelect.innerHTML = '<option value="">-- Select Area --</option>'; 
-
-            const selectedDivision = divisionSelect.value;
-            const selectedASM = asmSelect.value;
-            
-            if (selectedDivision && selectedASM && hierarchyData[selectedDivision][selectedASM]) {
-                hierarchyData[selectedDivision][selectedASM].forEach(area => {
-                    const option = document.createElement('option');
-                    option.value = area;
-                    option.textContent = area;
-                    areaSelect.appendChild(option);
-                });
-            }
-        }
-        
-        // Event Listeners for cascading dropdowns
-        divisionSelect.addEventListener('change', populateASMs);
-        asmSelect.addEventListener('change', populateAreas);
-
-        // Initial load
-        populateDivisions();
-        
-        // ---------------------------------------------------
-        // II. Geolocation and Data Submission Logic
-        // ---------------------------------------------------
+        // Note on Picture: We cannot send the image file directly via a simple
+        // fetch request to Apps Script. A direct file upload requires either:
+        // 1. Uploading to Google Drive via the Drive API (more complex).
+        // 2. Uploading to a server (like your own PHP/Node backend).
+        //
+        // FOR SIMPLICITY WITH GOOGLE SHEETS: We will only send the text data
+        // (Code, Name, Coordinates). The image input is included to prompt the 
+        // user to take a picture, making it a required step.
 
         locationForm.addEventListener('submit', function(e) {
             e.preventDefault(); 
             
-            // 1. Check if all fields are filled
-            if (!divisionSelect.value || !asmSelect.value || !areaSelect.value || !document.getElementById('storeName').value) {
-                statusText.textContent = '❌ Please fill all fields (Division, ASM, Area, and Store Name).';
+            // 1. Basic Validation
+            if (!document.getElementById('distributionCode').value || !document.getElementById('storeName').value || pictureInput.files.length === 0) {
+                statusText.textContent = '❌ Please fill Distribution Code, Store Name, and take a Picture.';
                 statusText.classList.add('error');
                 return;
-            }
-
-            // 2. Start Geolocation
-            if ("geolocation" in navigator) {
-                statusText.textContent = 'Requesting location... (Please allow location access).';
-                statusText.classList.remove('error');
-                submitBtn.disabled = true; 
-
-                navigator.geolocation.getCurrentPosition(
-                    // Success Function
-                    (position) => {
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        const accuracy = position.coords.accuracy;
-
-                        // Accuracy check (if accuracy is poor, warn the user)
-                        if (accuracy > 30) {
-                            statusText.textContent = `⚠️ Location found, but accuracy is low (${Math.round(accuracy)}m). Try waiting outside or refresh and try again.`;
-                            statusText.classList.add('error');
-                            submitBtn.disabled = false;
-                            return;
-                        }
-
-                        displayLat.textContent = lat;
-                        displayLon.textContent = lon;
-                        statusText.textContent = `✅ Location acquired: Accuracy ${Math.round(accuracy)}m. Submitting data...`;
-                        statusText.classList.remove('error');
-
-                        // 3. Submit Data to Google Sheet
-                        const payload = {
-                            division: divisionSelect.value, 
-                            asm: asmSelect.value, 
-                            area: areaSelect.value, 
-                            storeName: document.getElementById('storeName').value,
-                            latitude: lat,
-                            longitude: lon
-                        };
-
-                        fetch(WEB_APP_URL, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'text/plain;charset=utf-8', 
-                            },
-                            body: JSON.stringify(payload)
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.status === 'SUCCESS') {
-                                statusText.textContent = `🥳 Success! Data for '${payload.storeName}' saved to Google Sheet.`;
-                                statusText.classList.remove('error');
-                                // Reset form and dropdowns
-                                locationForm.reset();
-                                displayLat.textContent = '...';
-                                displayLon.textContent = '...';
-                                populateASMs(); 
-                                populateAreas(); 
-                            } else {
-                                statusText.textContent = `❌ Error: Could not save data. (${data.message || 'Unknown error'})`;
-                                statusText.classList.add('error');
-                            }
-                            submitBtn.disabled = false;
-                        })
-                        .catch((error) => {
-                            statusText.textContent = `❌ Communication Error: Check Web App URL or internet connection.`;
-                            statusText.classList.add('error');
-                            console.error('Fetch error:', error);
-                            submitBtn.disabled = false;
-                        });
-                        
-                    },
-                    
-                    // Error Function
-                    (error) => {
-                        submitBtn.disabled = false;
-                        let errorMessage = 'Could not get location.';
-                        if (error.code === error.PERMISSION_DENIED) {
-                            errorMessage = "❌ Permission Denied. Please allow location access in your browser settings.";
-                        } else if (error.code === error.POSITION_UNAVAILABLE) {
-                            errorMessage = "❌ Location information unavailable. Check GPS/Internet connection.";
-                        } else if (error.code === error.TIMEOUT) {
-                            errorMessage = "❌ Timed out waiting for location. Please try again.";
-                        }
-                        statusText.textContent = errorMessage;
-                        statusText.classList.add('error');
-                    },
-                    
-                    // Options for high accuracy
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 20000,
-                        maximumAge: 0
-                    }
-                );
-                
-            } else {
-                statusText.textContent = "❌ Your browser does not support Geolocation.";
-                statusText.classList.add('error');
-            }
-        });
-    </script> 
-</body>
-</html>
