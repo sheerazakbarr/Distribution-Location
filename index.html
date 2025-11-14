@@ -7,147 +7,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* (Styling code is the same as before for clean looks) */
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #71b7e6, #9b59b6);
-            color: #333;
-            overflow-x: hidden;
-        }
-
-        .container {
-            background-color: #ffffff;
-            padding: 30px 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-            box-sizing: border-box;
-        }
-
-        h1 {
-            color: #34495e;
-            margin-bottom: 25px;
-            font-size: 2.1em;
-            font-weight: 700;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #555;
-            text-align: left;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 1em;
-            box-sizing: border-box;
-        }
-
-        /* --- Camera Input Styling --- */
-        /* Hides the actual input file field */
-        #pictureInput {
-            width: 0.1px;
-            height: 0.1px;
-            opacity: 0;
-            overflow: hidden;
-            position: absolute;
-            z-index: -1;
-        }
-        
-        /* The custom label that looks like a button/field */
-        .camera-icon-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            padding: 15px;
-            border: 2px dashed #007bff;
-            background-color: #e6f7ff;
-            color: #007bff;
-            font-weight: 700;
-            font-size: 1.1em;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        
-        .camera-icon-label:hover {
-            background-color: #d0eaff;
-        }
-
-        .camera-icon-label i {
-            font-size: 1.5em;
-            color: #555;
-        }
-        /* --- End Camera Input Styling --- */
-
-
-        button {
-            background-color: #28a745;
-            color: white;
-            padding: 14px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: 700;
-            margin-top: 20px;
-        }
-
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-
-        #status {
-            margin-top: 20px;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 1em;
-            background-color: #e0f7fa;
-            color: #00796b;
-            text-align: center;
-        }
-        
-        #status.error {
-            background-color: #ffebee;
-            color: #c62828;
-        }
-
-        .coords-display {
-            margin-top: 15px;
-            text-align: left;
-            font-size: 0.95em;
-            color: #666;
-        }
-        
-        #fileNameDisplay {
-            margin-top: 5px;
-            font-size: 0.9em;
-            color: #007bff;
-            font-style: italic;
-            text-align: center;
-        }
+        /* (Styling code omitted for brevity - same as before) */
+        body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #71b7e6, #9b59b6); color: #333; overflow-x: hidden; }
+        .container { background-color: #ffffff; padding: 30px 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); width: 100%; max-width: 450px; text-align: center; box-sizing: border-box; }
+        h1 { color: #34495e; margin-bottom: 25px; font-size: 2.1em; font-weight: 700; }
+        form { display: flex; flex-direction: column; gap: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; text-align: left; }
+        input[type="text"] { width: 100%; padding: 12px 15px; border: 1px solid #ccc; border-radius: 8px; font-size: 1em; box-sizing: border-box; }
+        #pictureInput { width: 0.1px; height: 0.1px; opacity: 0; overflow: hidden; position: absolute; z-index: -1; }
+        .camera-icon-label { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px; border: 2px dashed #007bff; background-color: #e6f7ff; color: #007bff; font-weight: 700; font-size: 1.1em; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease; }
+        .camera-icon-label:hover { background-color: #d0eaff; }
+        .camera-icon-label i { font-size: 1.5em; color: #555; }
+        button { background-color: #28a745; color: white; padding: 14px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1em; font-weight: 700; margin-top: 20px; }
+        button:disabled { background-color: #cccccc; cursor: not-allowed; }
+        #status { margin-top: 20px; padding: 12px; border-radius: 8px; font-size: 1em; background-color: #e0f7fa; color: #00796b; text-align: center; }
+        #status.error { background-color: #ffebee; color: #c62828; }
+        .coords-display { margin-top: 15px; text-align: left; font-size: 0.95em; color: #666; }
+        #fileNameDisplay { margin-top: 5px; font-size: 0.9em; color: #007bff; font-style: italic; text-align: center; }
     </style>
 </head>
 <body>
@@ -157,8 +33,8 @@
         
         <form id="locationForm">
             
-            <label for="distributionCode">Distribution Code:</label>
-            <input type="text" id="distributionCode" placeholder="Enter Distribution Code" required>
+            <label for="distributionCode">Distribution Code (5 Digits Required):</label>
+            <input type="text" id="distributionCode" placeholder="Enter 5-digit Code" required pattern="[0-9]{5}" maxlength="5">
             
             <label for="distributionName">Distribution Name:</label>
             <input type="text" id="distributionName" placeholder="Enter Distribution Name" required>
@@ -188,51 +64,88 @@
         // *************************************************************************
         // ⚠️ CRITICAL: Paste your Google Apps Script Web App URL here
         // *************************************************************************
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwk_pXd36_ej3lw_Zl5ACdDR74KAhcxYGrn6yw0qD7BwL4T8stAQVQCcH_DgVde97lEfA/exec'; 
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwk_pXd36_ej3lw_Zl5ACdDR74KAhcxYGrn6yw0qD7BwL4T8stAQVQCcH_DgVde97lEfA/exec'; 
         // *************************************************************************
 
         const locationForm = document.getElementById('locationForm');
         const statusText = document.getElementById('status');
         const submitBtn = document.getElementById('submitBtn');
         const pictureInput = document.getElementById('pictureInput');
+        const distributionCodeInput = document.getElementById('distributionCode');
         const displayLat = document.getElementById('displayLat');
         const displayLon = document.getElementById('displayLon');
         const displayTime = document.getElementById('displayTime');
         const fileNameDisplay = document.getElementById('fileNameDisplay');
         
-        // Function to format current time
+        // --- Helper Functions ---
+        
         function getCurrentTimestamp() {
             const now = new Date();
-            // Using toLocaleString with Pakistan timezone for local accuracy
             return now.toLocaleString('en-PK', { timeZone: 'Asia/Karachi', year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
         }
+        
+        // 📸 New function to convert File to Base64 📸
+        function getBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+        
+        // --- Event Listeners ---
 
-        // Display file name after capture
         pictureInput.addEventListener('change', function() {
             if (this.files && this.files.length > 0) {
-                // Since capture="environment" is used, we assume this is a live photo.
-                fileNameDisplay.textContent = '✅ Picture Captured successfully.';
+                fileNameDisplay.textContent = `✅ Picture Captured successfully: ${this.files[0].name}`;
             } else {
                 fileNameDisplay.textContent = 'No picture captured.';
             }
         });
 
 
-        locationForm.addEventListener('submit', function(e) {
-            e.preventDefault(); 
+        locationForm.addEventListener('submit', async function(e) { // **Added 'async' here**
+            e.preventDefault(); 
             
+            const distributionCode = distributionCodeInput.value.trim();
+            const distributionName = document.getElementById('distributionName').value.trim();
+            const pictureFile = pictureInput.files[0];
+
             // 1. Basic Validation
-            if (!document.getElementById('distributionCode').value || !document.getElementById('distributionName').value || pictureInput.files.length === 0) {
+            if (!distributionCode || !distributionName || !pictureFile) {
                 statusText.textContent = '❌ Please fill all required fields and capture a Picture.';
                 statusText.classList.add('error');
                 return;
             }
 
-            // 2. Start Geolocation
+            // 1B. Distribution Code Length Check
+            if (distributionCode.length !== 5 || isNaN(distributionCode)) {
+                statusText.textContent = '❌ Invalid Distribution Code. It must be a 5-digit number.';
+                statusText.classList.add('error');
+                return;
+            }
+            
+            // 2. Base64 Conversion (New Step)
+            statusText.textContent = 'Converting picture for upload...';
+            submitBtn.disabled = true; 
+            let base64Data;
+            try {
+                // Remove the initial part of the string (e.g., "data:image/jpeg;base64,")
+                base64Data = await getBase64(pictureFile);
+                base64Data = base64Data.split(',')[1]; 
+            } catch (error) {
+                statusText.textContent = '❌ Error processing image file.';
+                statusText.classList.add('error');
+                submitBtn.disabled = false;
+                return;
+            }
+
+
+            // 3. Start Geolocation
             if ("geolocation" in navigator) {
                 statusText.textContent = 'Requesting location... (Please allow access).';
                 statusText.classList.remove('error');
-                submitBtn.disabled = true; 
 
                 navigator.geolocation.getCurrentPosition(
                     // Success Function
@@ -255,16 +168,20 @@
                         statusText.textContent = `✅ Location acquired: Accuracy ${Math.round(accuracy)}m. Submitting data...`;
                         statusText.classList.remove('error');
 
-                        // 3. Prepare Payload (ONLY text data for Google Sheet)
+                        // 4. Prepare Payload (NOW including file data)
                         const payload = {
-                            distributionCode: document.getElementById('distributionCode').value,
-                            distributionName: document.getElementById('distributionName').value,
+                            distributionCode: distributionCode,
+                            distributionName: distributionName,
                             latitude: lat,
                             longitude: lon,
-                            manualTimestamp: submissionTime
+                            manualTimestamp: submissionTime,
+                            fileData: {
+                                base64: base64Data,
+                                mimeType: pictureFile.type || 'image/jpeg' // Fallback mime type
+                            }
                         };
 
-                        // 4. Submit Data to Google Sheet
+                        // 5. Submit Data to Google Sheet & Drive
                         fetch(WEB_APP_URL, {
                             method: 'POST',
                             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -273,13 +190,16 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.status === 'SUCCESS') {
-                                statusText.textContent = `🥳 Success! Data for '${payload.distributionCode}' saved to Google Sheet.`;
+                                statusText.textContent = `🥳 Success! Data saved. Image Link: ${data.fileUrl ? 'Drive Link generated.' : 'No Link.'}`;
                                 statusText.classList.remove('error');
                                 locationForm.reset();
                                 displayLat.textContent = '...';
                                 displayLon.textContent = '...';
                                 displayTime.textContent = '...';
                                 fileNameDisplay.textContent = 'No picture captured.';
+                            } else if (data.message && data.message.includes('Already submitted')) {
+                                statusText.textContent = `❌ Already Submitted: Distribution Code ${payload.distributionCode} has already been recorded.`;
+                                statusText.classList.add('error');
                             } else {
                                 statusText.textContent = `❌ Error: Could not save data. (${data.message || 'Unknown error'})`;
                                 statusText.classList.add('error');
@@ -309,9 +229,9 @@
             } else {
                 statusText.textContent = "❌ Your browser does not support Geolocation.";
                 statusText.classList.add('error');
+                submitBtn.disabled = false;
             }
         });
-    </script> 
+    </script>
 </body>
 </html>
-
