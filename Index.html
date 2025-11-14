@@ -114,4 +114,319 @@
 
         #status.error {
             background-color: #ffebee;
-            color: #c62
+            color: #c62828;
+        }
+
+        .coords-display {
+            margin-top: 15px;
+            text-align: right; /* Align coordinates to the right */
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        .coords-display span {
+            font-weight: 600;
+            color: #444;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .container {
+                margin: 20px;
+                padding: 25px 30px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            button {
+                font-size: 1em;
+                padding: 12px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🛒 سٹور لوکیشن بھیجیں</h1>
+        
+        <form id="locationForm">
+            
+            <label for="division">ڈویژن (Division) منتخب کریں:</label>
+            <select id="division" required>
+                <option value="">-- ڈویژن منتخب کریں --</option>
+            </select>
+
+            <label for="asm">اے ایس ایم (ASM) منتخب کریں:</label>
+            <select id="asm" required>
+                <option value="">-- اے ایس ایم منتخب کریں --</option>
+            </select>
+
+            <label for="area">علاقہ (Area) منتخب کریں:</label>
+            <select id="area" required>
+                <option value="">-- علاقہ منتخب کریں --</option>
+            </select>
+            
+            <label for="storeName">سٹور کا نام درج کریں:</label>
+            <input type="text" id="storeName" placeholder="سٹور کا نام یہاں لکھیں" required>
+            
+            <div id="status">لوکیشن حاصل کرنے کے لیے 'Submit' پر کلک کریں...</div>
+
+            <button type="submit" id="submitBtn">لوکیشن حاصل کر کے Google Sheet میں Submit کریں</button>
+
+            <div class="coords-display">
+                <p>Latitude: <span id="displayLat">...</span></p>
+                <p>Longitude: <span id="displayLon">...</span></p>
+            </div>
+
+        </form>
+    </div>
+
+    <script>
+        // *************************************************************************
+        // ⚠️ بہت ضروری: جو 'Web app URL' آپ نے Apps Script سے کاپی کیا ہے، وہ یہاں پیسٹ کریں
+        // *************************************************************************
+        const WEB_APP_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE'; 
+        // *************************************************************************
+
+        // Hierarchy Data (تصویر سے نکالا گیا سادہ شدہ ڈیٹا)
+        const hierarchyData = {
+            "FBRM CENTRAL": {
+                "ASM GUJRANWALA": ["GUJRANWALA A", "GUJRANWALA B", "GUJRANWALA C"],
+                "ASM LAHORE D": ["LAHORE D/F", "LAHORE D/C", "LAHORE CANTT"],
+                "ASM MULTAN": ["MULTAN A", "MULTAN B", "MULTAN C", "MULTAN D"],
+                "ASM FAISALABAD": ["FSD A", "FSD B", "FSD C"],
+                "ASM SIALKOT": ["SIALKOT A", "SIALKOT B"],
+                "ASM SHEIKHUPURA": ["SHEIKHUPURA A", "SHEIKHUPURA B"],
+                "ASM SAHIWAL": ["SAHIWAL A", "SAHIWAL B"],
+                "ASM BAHAWALPUR": ["BWP A", "BWP B"],
+                "ASM RAHIM YAR KHAN": ["RYK A", "RYK B"],
+                "ASM ATTOCK": ["ATTOCK A"],
+                "ASM DG KHAN": ["DG KHAN A"],
+                "ASM JHELUM": ["JHELUM A"],
+                "ASM JHANG": ["JHANG A"],
+                "ASM KASUR": ["KASUR A"],
+                "ASM KHANEWAL": ["KHANEWAL A"],
+                "ASM MIANWALI": ["MIANWALI A"],
+                "ASM MUZAFFARGARH": ["MUZAFFARGARH A"],
+                "ASM OKARA": ["OKARA A"],
+                "ASM SAIDPUR": ["SAIDPUR A"],
+                "ASM SARGODHA": ["SARGODHA A", "SARGODHA B"],
+                "ASM TAXILA": ["TAXILA A"],
+                "ASM TOBA TEK SINGH": ["TTS A"],
+                "ASM VEHARI": ["VEHARI A"]
+            },
+            "FBRM NORTH": {
+                "ASM RAWALPINDI": ["RWP A", "RWP B", "RWP C", "RWP D"],
+                "ASM PESHAWAR": ["PESHAWAR A", "PESHAWAR B", "PESHAWAR C"],
+                "ASM ISLAMABAD": ["ISLAMABAD A", "ISLAMABAD B"],
+                "ASM ABBOTTABAD": ["ABBOTTABAD A"],
+                "ASM BUNER": ["BUNER A"],
+                "ASM CHAKWAL": ["CHAKWAL A"],
+                "ASM DIR LOWER": ["DIR L A"],
+                "ASM SWAT": ["SWAT A"],
+                "ASM KOHAT": ["KOHAT A"],
+                "ASM MARDAN": ["MARDAN A"],
+                "ASM NOWSHERA": ["NOWSHERA A"],
+                "ASM SAWABI": ["SWABI A"],
+                "ASM WAHP CANTT": ["WAHC A"],
+                "ASM BANNU": ["BANNU A"],
+                "ASM DERA ISMAIL KHAN": ["DIK A"],
+                "ASM HARIPUR": ["HARIPUR A"],
+                "ASM KHARIAN": ["KHARIAN A"],
+                "ASM MANSEHRA": ["MANSEHRA A"],
+                "ASM MINGORA": ["MINGORA A"],
+                "ASM PARACHINAR": ["PARACHINAR A"],
+                "ASM SAKKARDU": ["SKD A"],
+                "ASM GILGIT": ["GILGIT A"],
+                "ASM MUZZAFARABAD": ["MUZAF A"],
+                "ASM MIRPUR": ["MIRPUR A"],
+                "ASM BAGH": ["BAGH A"]
+            },
+            "FBRM SOUTH": {
+                "ASM KARACHI F": ["KHI F"],
+                "ASM KARACHI C": ["KHI C", "KHI C/B"],
+                "ASM HYDERABAD": ["HYD A", "HYD B"],
+                "ASM SUKKUR": ["SUKKUR A"],
+                "ASM QUETTA": ["QUETTA A"],
+                "ASM LARKANA": ["LARKANA A"],
+                "ASM NAWABSHAH": ["NWB A"],
+                "ASM CHAMAN": ["CHAMAN A"]
+            }
+            // आप यहां अपनी पूरी Hierarchy शामिल कर सकते हैं
+        };
+
+        const divisionSelect = document.getElementById('division');
+        const asmSelect = document.getElementById('asm');
+        const areaSelect = document.getElementById('area');
+        const locationForm = document.getElementById('locationForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const displayLat = document.getElementById('displayLat');
+        const displayLon = document.getElementById('displayLon');
+
+
+        // ---------------------------------------------------
+        // I. Hierarchy Selectors ko Populate karne ka Function
+        // ---------------------------------------------------
+
+        function populateDivisions() {
+            for (const division in hierarchyData) {
+                const option = document.createElement('option');
+                option.value = division;
+                option.textContent = division;
+                divisionSelect.appendChild(option);
+            }
+        }
+
+        function populateASMs() {
+            asmSelect.innerHTML = '<option value="">-- اے ایس ایم منتخب کریں --</option>'; // Reset
+            areaSelect.innerHTML = '<option value="">-- علاقہ منتخب کریں --</option>'; // Reset
+            
+            const selectedDivision = divisionSelect.value;
+            if (selectedDivision && hierarchyData[selectedDivision]) {
+                for (const asm in hierarchyData[selectedDivision]) {
+                    const option = document.createElement('option');
+                    option.value = asm;
+                    option.textContent = asm;
+                    asmSelect.appendChild(option);
+                }
+            }
+        }
+
+        function populateAreas() {
+            areaSelect.innerHTML = '<option value="">-- علاقہ منتخب کریں --</option>'; // Reset
+
+            const selectedDivision = divisionSelect.value;
+            const selectedASM = asmSelect.value;
+            
+            if (selectedDivision && selectedASM && hierarchyData[selectedDivision][selectedASM]) {
+                hierarchyData[selectedDivision][selectedASM].forEach(area => {
+                    const option = document.createElement('option');
+                    option.value = area;
+                    option.textContent = area;
+                    areaSelect.appendChild(option);
+                });
+            }
+        }
+        
+        // Event Listeners
+        divisionSelect.addEventListener('change', populateASMs);
+        asmSelect.addEventListener('change', populateAreas);
+
+        // Initial load
+        populateDivisions();
+        
+        // ---------------------------------------------------
+        // II. Geolocation aur Data Submission Logic
+        // ---------------------------------------------------
+
+        locationForm.addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            
+            // 1. Check karein ke form fields bhare hain ya nahin
+            if (!divisionSelect.value || !asmSelect.value || !areaSelect.value || !document.getElementById('storeName').value) {
+                statusText.textContent = '❌ براہ کرم تمام فیلڈز (ڈویژن، اے ایس ایم، علاقہ، اور سٹور کا نام) بھریں۔';
+                statusText.classList.add('error');
+                return;
+            }
+
+            // 2. Geolocation shuru karein
+            if ("geolocation" in navigator) {
+                statusText.textContent = 'لوکیشن کی درخواست کی جا رہی ہے... (براہ کرم لوکیشن کی اجازت دیں۔).';
+                statusText.classList.remove('error');
+                submitBtn.disabled = true; 
+
+                navigator.geolocation.getCurrentPosition(
+                    // Success Function
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        const accuracy = position.coords.accuracy;
+
+                        // Accuracy check
+                        if (accuracy > 30) { // اگر 30 میٹر سے زیادہ غلطی ہو
+                            statusText.textContent = `⚠️ لوکیشن مل گئی، لیکن Accuracy کم ہے (${Math.round(accuracy)}m). بہتر Accuracy کے لیے تھوڑا انتظار کریں یا کھلی جگہ پر دوبارہ کوشش کریں۔`;
+                            statusText.classList.add('error');
+                            submitBtn.disabled = false;
+                            return;
+                        }
+
+                        displayLat.textContent = lat;
+                        displayLon.textContent = lon;
+                        statusText.textContent = `✅ لوکیشن حاصل: Accuracy ${Math.round(accuracy)}m. ڈیٹا بھیجا جا رہا ہے...`;
+                        statusText.classList.remove('error');
+
+                        // 3. Data ko Google Sheet mein bhejein
+                        const payload = {
+                            division: divisionSelect.value, 
+                            asm: asmSelect.value, 
+                            area: areaSelect.value, 
+                            storeName: document.getElementById('storeName').value,
+                            latitude: lat,
+                            longitude: lon
+                        };
+
+                        fetch(WEB_APP_URL, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'text/plain;charset=utf-8', 
+                            },
+                            body: JSON.stringify(payload)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'SUCCESS') {
+                                statusText.textContent = `🥳 کامیابی! سٹور '${payload.storeName}' کا ڈیٹا Google Sheet میں محفوظ ہو گیا ہے۔`;
+                                statusText.classList.remove('error');
+                                // Form ko reset kar sakte hain
+                                locationForm.reset();
+                                displayLat.textContent = '...';
+                                displayLon.textContent = '...';
+                                populateASMs(); // Reset ASM dropdown
+                                populateAreas(); // Reset Area dropdown
+                            } else {
+                                statusText.textContent = `❌ خرابی: ڈیٹا محفوظ نہیں ہو سکا. (${data.message || 'نامعلوم خرابی'})`;
+                                statusText.classList.add('error');
+                            }
+                            submitBtn.disabled = false;
+                        })
+                        .catch((error) => {
+                            statusText.textContent = `❌ کمیونیکیشن خرابی: Web App URL یا انٹرنیٹ کنیکشن چیک کریں۔`;
+                            statusText.classList.add('error');
+                            console.error('Fetch error:', error);
+                            submitBtn.disabled = false;
+                        });
+                        
+                    },
+                    
+                    // Error Function
+                    (error) => {
+                        submitBtn.disabled = false;
+                        let errorMessage = 'لوکیشن حاصل نہیں ہو سکی۔';
+                        if (error.code === error.PERMISSION_DENIED) {
+                            errorMessage = "❌ آپ نے لوکیشن شیئر کرنے کی اجازت نہیں دی۔ براہ کرم براؤزر کی سیٹنگز میں اجازت دیں۔";
+                        } else if (error.code === error.POSITION_UNAVAILABLE) {
+                            errorMessage = "❌ لوکیشن کی معلومات دستیاب نہیں۔ GPS یا انٹرنیٹ کنیکشن چیک کریں۔";
+                        } else if (error.code === error.TIMEOUT) {
+                            errorMessage = "❌ لوکیشن حاصل کرنے میں بہت زیادہ وقت لگ گیا۔ دوبارہ کوشش کریں۔";
+                        }
+                        statusText.textContent = errorMessage;
+                        statusText.classList.add('error');
+                    },
+                    
+                    // Options: High Accuracy aur Timeout
+                    {
+                        enableHighAccuracy: true,   // زیادہ درستگی کی کوشش کریں (GPS استعمال کریں)
+                        timeout: 20000,             // 20 سیکنڈ تک انتظار کریں
+                        maximumAge: 0               // پرانی لوکیشن استعمال نہ کریں، ہمیشہ نئی لوکیشن لیں۔
+                    }
+                );
+                
+            } else {
+                statusText.textContent = "❌ آپ کا براؤزر Geolocation کو سپورٹ نہیں کرتا.";
+                statusText.classList.add('error');
+            }
+        });
+    </script> 
+</body>
+</html>
