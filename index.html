@@ -12,7 +12,8 @@
         
         /* Logo Styling */
         .logo-container { margin-bottom: 20px; }
-        .logo-container img { max-width: 200px; height: auto; display: block; margin: 0 auto; }
+        /* Logo size ko chhota kiya gaya hai taake accha dikhe */
+        .logo-container img { max-width: 200px; height: auto; display: block; margin: 0 auto; } 
 
         h1 { color: #34495e; margin-bottom: 25px; font-size: 2.1em; font-weight: 700; }
         form { display: flex; flex-direction: column; gap: 15px; }
@@ -38,7 +39,7 @@
     <div class="container">
         
         <div class="logo-container">
-            <img src="https://i.imgur.com/your-mitchells-logo-image.png" alt="Mitchell's Logo">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/cb/Mitchells_pakistan_logo.png" alt="Mitchell's Logo">
         </div>
         
         <h1>Distribution Coordinates</h1>
@@ -75,7 +76,6 @@
         // *************************************************************************
         // ⚠️ CRITICAL: Paste your Google Apps Script Web App URL here
         // *************************************************************************
-        // Agar aapka URL badla nahi to yahi rahega
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwk_pXd36_ej3lw_Zl5ACdDR74KAhcxYGrn6yw0qD7BwL4T8stAQVQCcH_DgVde97lEfA/exec'; 
         // *************************************************************************
 
@@ -86,9 +86,9 @@
         const displayLat = document.getElementById('displayLat');
         const displayLon = document.getElementById('displayLon');
         const displayTime = document.getElementById('displayTime');
-        const pictureInput = document.getElementById('pictureInput'); // Re-added
-        const fileNameDisplay = document.getElementById('fileNameDisplay'); // Re-added
-
+        const pictureInput = document.getElementById('pictureInput');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        
         
         function getCurrentTimestamp() {
             const now = new Date();
@@ -110,10 +110,10 @@
             
             const distributionCode = distributionCodeInput.value.trim().toUpperCase(); 
             const distributionName = document.getElementById('distributionName').value.trim();
-            const pictureFile = pictureInput.files[0]; // Check if a file is captured
+            const pictureFile = pictureInput.files[0]; 
 
             // 1. Basic Validation
-            if (!distributionCode || !distributionName || !pictureFile) { // Check for picture file
+            if (!distributionCode || !distributionName || !pictureFile) { 
                 statusText.textContent = '❌ Please fill all required fields and capture a Picture.';
                 statusText.classList.add('error');
                 return;
@@ -154,7 +154,7 @@
                         statusText.textContent = `✅ Location acquired: Accuracy ${Math.round(accuracy)}m. Submitting data...`;
                         statusText.classList.remove('error');
 
-                        // 3. Prepare Payload (ONLY text data) - Image file is NOT included in payload
+                        // 3. Prepare Payload (ONLY text data)
                         const payload = {
                             distributionCode: distributionCode,
                             distributionName: distributionName,
@@ -163,7 +163,7 @@
                             manualTimestamp: submissionTime
                         };
 
-                        // 4. Submit Data to Google Sheet (Apps Script will ignore the picture)
+                        // 4. Submit Data to Google Sheet
                         fetch(WEB_APP_URL, {
                             method: 'POST',
                             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
